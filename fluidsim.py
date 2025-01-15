@@ -42,6 +42,7 @@ class Particle:
         self.surface=surface
         self.radius=radius
         self.e=e
+        self.border = 0.5
 
     def move(self,acc:Pair,delta_time:float):
 
@@ -58,16 +59,26 @@ class Particle:
         #Draw a circle of small radius
         pygame.draw.circle(self.surface,(0,255,0),self.pos.tuple(),self.radius)        
 
-    def collide_with_boundary(self,pos:Pair,height,width):
+    def collide_with_boundary(self,pos:Pair,height,width,t):
 
         #Check if we hit boundary
-        if self.pos.x - self.radius < pos.x or self.pos.x + self.radius > pos.x+width:
-            self.v.x = -0.9 * self.v.x
-        if self.pos.y - self.radius < pos.y or self.pos.y + self.radius > pos.y+height:
-            self.v.y = -0.9 * self.v.y
-
+        #If so, reverse the velocity
+        #Reset position to boundary
+        if self.pos.x - self.radius < pos.x:
+            self.v.x = -self.e * self.v.x
+            self.pos.x = pos.x + self.radius
+        elif self.pos.x + self.radius > pos.x+width:
+            self.v.x = -self.e * self.v.x
+            self.pos.x = pos.x - self.radius + width
+        elif self.pos.y - self.radius < pos.y:
+            self.v.y = -self.e * self.v.y
+            self.pos.y = pos.y + self.radius
+        elif self.pos.y + self.radius > pos.y+height:
+            print("CASE")
+            self.v.y = -self.e * self.v.y
+            self.pos.y = pos.y - self.radius + height
         # print(f"{self.pos},({pos.x+width},{pos.y+height})")
-        print(f"{self.v.tuple()}")
+        print(f"{self.v.tuple()},{self.pos.tuple()},{t}")
 
 if __name__ == "__main__":
 
@@ -106,7 +117,7 @@ if __name__ == "__main__":
         time_stamp = curr_time
 
         p.move(Pair(0,9.8),elapsed)
-        p.collide_with_boundary(container.anchor,container.height,container.width)
+        p.collide_with_boundary(container.anchor,container.height,container.width,elapsed)
         p.draw()
 
         # Update the display
