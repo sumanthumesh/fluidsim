@@ -97,6 +97,9 @@ def distance(p1:Pair,p2:Pair):
 def particle_collision(p1:Particle,p2:Particle,e:float):
     #Function takes two particles and assigns them new velocities after collision
     
+    print(f"{p1.pos} v/s {p2.pos}")
+
+
     #Find centers of both particles
     c1 = p1.pos.vector()
     c2 = p2.pos.vector()
@@ -111,12 +114,12 @@ def particle_collision(p1:Particle,p2:Particle,e:float):
     v2N = np.dot(p2.v.vector(),vec_u_N)
 
     #Using conservation of momentum and coefficient of restitution
-    v1N_new = ((1-e)*v2N+(1+e)*v1N)/2
-    v2N_new = ((1+e)*v2N+(1-e)*v1N)/2
+    v1N_new = ((1+e)*v2N+(1-e)*v1N)/2
+    v2N_new = ((1-e)*v2N+(1+e)*v1N)/2
 
     #Turning the new velocity components into vector along x and y
-    vec_v1N_new = v1N*vec_u_N
-    vec_v2N_new = v2N*vec_u_N
+    vec_v1N_new = v1N_new*vec_u_N
+    vec_v2N_new = v2N_new*vec_u_N
 
     #The tangential components remain the same
     #Find the tangential vector or vector perpendicular to the normal
@@ -132,12 +135,28 @@ def particle_collision(p1:Particle,p2:Particle,e:float):
     p1.v = Pair(v1_new[0],v1_new[1])
     p2.v = Pair(v2_new[0],v2_new[1])
 
+    #Set new positions so that they dont continue collisions and their veclocities dont oscillate
+    # point of collision
+    c_mid = (c1+c2)/2
+    # Unit vector from point of collision to center of p1
+    vec_u_p1 = (c1-c_mid)/np.linalg.norm(c1-c_mid)
+    vec_u_p2 = (c2-c_mid)/np.linalg.norm(c2-c_mid)
+
+    # New position
+    new_p1 = c_mid + (p1.radius+0.5)*vec_u_p1
+    new_p2 = c_mid + (p2.radius+0.5)*vec_u_p2
+
+    # Set position to particles
+    p1.pos = Pair(new_p1[0],new_p1[1])
+    p2.pos = Pair(new_p2[0],new_p2[1])
+
+
     #Set the position so that they are both a bit apart
     #Find the distance they differ by
     #Half this distance is how much I need to move each particle away from each other, along the line
     # d = distance(p1.pos,p2.pos)*0.5
-    # print(f"{p1.v.x}=={p2.v.x}")
-    # print(f"{p1.pos.x}<->{p2.pos.x}")
+    print(f"{p1.v.x}=={p2.v.x}")
+    print(f"{p1.pos.x}<->{p2.pos.x}")
     # theta1 = math.atan((p1.pos.y-p2.pos.y)/(p1.pos.x-p2.pos.x))
     # theta2 = theta1 + math.radians(180)
     # p1.pos = Pair(math.floor(p1.pos.x-d*math.cos(theta1)),math.floor(p1.pos.y-d*math.sin(theta1)))
@@ -221,7 +240,7 @@ if __name__ == "__main__":
 
     #List of particles
     # plist = [Particle(Pair(150,150+20*i),Pair(0,0),5,screen) for i in range(NUM_PARTICLES)]
-    plist = [Particle(Pair(150,150),Pair(10,0),5,screen),Particle(Pair(170,150),Pair(-10,0),5,screen)]
+    plist = [Particle(Pair(150,150),Pair(0,0),10,screen),Particle(Pair(155,170),Pair(0,0),5,screen)]
     #Hashmap to access by ID
     particles = {x.id:x for x in plist}
 
