@@ -3,6 +3,7 @@ import time
 import math
 from typing import List,Dict,Tuple,Set
 import numpy as np
+import random
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -227,7 +228,7 @@ class SpatialMap:
 
 if __name__ == "__main__":
 
-    NUM_PARTICLES = 2
+    NUM_PARTICLES = 100
 
     # Initialize Pygame
     pygame.init()
@@ -240,7 +241,13 @@ if __name__ == "__main__":
 
     #List of particles
     # plist = [Particle(Pair(150,150+20*i),Pair(0,0),5,screen) for i in range(NUM_PARTICLES)]
-    plist = [Particle(Pair(150,150),Pair(0,0),10,screen),Particle(Pair(155,170),Pair(0,0),5,screen)]
+    # plist = [Particle(Pair(150,150),Pair(0,0),10,screen),Particle(Pair(155,170),Pair(0,0),5,screen)]
+    #Random particles
+    plist:List[Particle] = []
+    for i in range(NUM_PARTICLES):
+        pos = Pair(random.randrange(container.anchor.x,container.anchor.x+container.width),random.randrange(container.anchor.y,container.anchor.y+container.height))
+        v = Pair(random.randrange(-10,10),random.randrange(-10,10))
+        plist.append(Particle(pos,v,5,screen))
     #Hashmap to access by ID
     particles = {x.id:x for x in plist}
 
